@@ -28,15 +28,6 @@ def create_connection_pool():
     finally:
         print('ccc',engine.pool.status()) 
    
-def get_user():
-    engine=create_connection_pool()
-    with engine.connect() as conn:
-        result = conn.execute(text("SELECT * FROM users"))
-        users = result.fetchone()
-        print(users)
-        return users
-    print(engine.pool.status())
-
 
 def insert_user():
     engine=create_connection_pool()
@@ -45,7 +36,7 @@ def insert_user():
         conn.execute(insert_stmt, {"name": "Alice", "age": 11})
         conn.commit()   
         print(conn.closed)
-
+    print(conn.closed)
 
 def generate_customer_table():
    customer_table = Table(
@@ -84,7 +75,6 @@ def generate_table_orm():
     session.commit()
 
 if __name__ == "__main__":
-        get_user()
         generate_customer_table()
         generate_table_orm()
         insert_user()
