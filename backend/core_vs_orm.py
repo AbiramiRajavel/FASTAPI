@@ -1,4 +1,4 @@
-from dbalchemy import  create_connection_pool
+from .dbalchemy import  create_connection_pool
 from sqlalchemy import  text
 from sqlalchemy.orm import sessionmaker,declarative_base
 from sqlalchemy import Column, Integer, String
@@ -32,6 +32,7 @@ def get_user_orm():
         users = session.query(User).all()
         for user in users:
             print(f"User ID: {user.id}, Name: {user.name}, Age: {user.age}")
+        return users    
     except Exception as e:
         print(f"Error fetching users: {e}")
     finally:

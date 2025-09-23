@@ -1,5 +1,12 @@
-from fastapi import FastAPI, Body, Depends
+from fastapi import FastAPI, Body, Depends, status, HTTPException
 from middleware import add_cors
+from backend.core_vs_orm import get_user_core, get_user_orm
+from backend.schemas import UserName
+from typing import List
+from backend.dbalchemy import create_connection_pool, User2
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import text
+
 app= FastAPI()
 add_cors(app)
 
@@ -31,11 +38,46 @@ def user_validation():
     return {'name':'abi','age':22}
 
 @app.put('/user')
-def update_user(data:dict=Depends({'alien':"mine"})):
+def update_user(data:dict=Depends(user_validation)):
      print(data)
      return data 
-     
  
+@app.get('/user',status_code=status.HTTP_202_ACCEPTED, response_model=List[UserName])
+def get_user(data:dict=Depends(user_validation)):
+    users=get_user_orm()
+    for user in users:
+        user_dict = {key: value for key, value in user.__dict__.items() 
+                    if not key.startswith('_')}
+        print(user_dict)
+    return users
+
+@app.post('/user/core', status_code=status.HTTP_201_CREATED)
+def create_user_core(name: str, age: int):
+    try:
+        engine = create_connection_pool()
+        with engine.connect() as conn:
+            insert_stmt = text("INSERT INTO users (name, age) VALUES (:name, :age)")
+            conn.execute(insert_stmt, {"name": name, "age": age})
+            conn.commit()
+        return {"message": "User created successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post('/user/orm', status_code=status.HTTP_201_CREATED)
+def create_user_orm(name: str, email: str):
+    try:
+        engine = create_connection_pool()
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        
+        user = User2(name=name, email=email)
+        session.add(user)
+        session.commit()
+        session.close()
+        return {"message": "User created successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__=="__main__":
     import uvicorn
     uvicorn.run(app,host="127.0.0.1",port=8000)
