@@ -36,7 +36,8 @@ def create_user(user_data, db):
 
     return response_user
  
-    def get_all_user(db):
+
+def get_all_user(db):
     try:
         users = db.query(User).all()
     except Exception as e:
