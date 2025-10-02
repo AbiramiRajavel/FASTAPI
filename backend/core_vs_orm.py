@@ -1,14 +1,9 @@
 from .dbalchemy import  create_connection_pool
 from sqlalchemy import  text
-from sqlalchemy.orm import sessionmaker,declarative_base
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Column, Integer, String
-base = declarative_base()
+from .table_schemas import User
 
-class User(base):
-    __tablename__ = 'users' # __table__ or __tablename__
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    age = Column(String)
 
 def get_user_core():
     engine=create_connection_pool()
