@@ -5,6 +5,7 @@ from backend.dbalchemy import create_connection_pool, User2, get_db
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
 from routes.user_routes import router as user_router
+from routes.auth_routes import router as login_router
 
 app = FastAPI()
 add_cors(app)
@@ -14,6 +15,7 @@ from backend.dbalchemy import create_tables
 
 create_tables()
 
+app.include_router(login_router)
 app.include_router(user_router)
 
 

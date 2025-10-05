@@ -9,7 +9,7 @@ from backend.user_curd import (
     update_user_id,
     delete_user,
 )
-
+from backend.auth import get_current_user
 router = APIRouter(prefix="/users", tags=["User Operations"])
 
 
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/users", tags=["User Operations"])
     "/allusers",
     response_model=List[UserCore],
 )
-def get_all_users(db=Depends(get_db)):
+def get_all_users(db=Depends(get_db), current_user=Depends(get_current_user)):
     users = get_all_user(db)
     return users
 
